@@ -396,3 +396,10 @@ FodyWeavers.xsd
 
 # JetBrains Rider
 *.sln.iml
+.DS_Store
+Entity Framework Core - 2023/T02_CourseIntroduction/T02_CourseIntroduction.pdf
+Entity Framework Core - 2023/T03_ADO.NET/T03_ADO.NET.pdf
+Entity Framework Core - 2023/T03_ADO.NET/T03_Resources/SoftUni-Database.sql
+Entity Framework Core - 2023/T04_ADO.NET_Exercises/T04_ADO.NET_Exercises.docx
+Entity Framework Core - 2023/T04_ADO.NET_Exercises/T04_Resources/MinionsDB.sql
+Entity Framework Core - 2023/T05_ORMFundamentals/T05_ORMFundamentals.pdf
