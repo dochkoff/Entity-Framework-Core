@@ -21,9 +21,9 @@ namespace SoftUni
             //Console.WriteLine(GetEmployee147(context));
             //Console.WriteLine(GetDepartmentsWithMoreThan5Employees(context));
             //Console.WriteLine(GetLatestProjects(context));
-            Console.WriteLine(IncreaseSalaries(context));
-
+            //Console.WriteLine(IncreaseSalaries(context));
             //Console.WriteLine(GetEmployeesByFirstNameStartingWithSa(context));
+            Console.WriteLine(DeleteProjectById(context));
         }
 
         //P03
@@ -305,6 +305,31 @@ namespace SoftUni
             string result = string.Join(Environment.NewLine, employees.Select(e => $"{e.FirstName} {e.LastName} - {e.JobTitle} - (${e.Salary:F2})"));
 
             return result;
+        }
+
+        //P14
+        public static string DeleteProjectById(SoftUniContext context)
+        {
+            var project = context.Projects
+                .Find(2);
+
+            context.EmployeesProjects.RemoveRange(context.EmployeesProjects.Where(ep => ep.Project == project));
+            context.Projects.Remove(project);
+
+            context.SaveChanges();
+
+            var result = new StringBuilder();
+
+            var projects = context.Projects
+                .Take(10)
+                .ToList();
+
+            foreach (var p in projects)
+            {
+                result.AppendLine(p.Name);
+            }
+
+            return result.ToString().Trim();
         }
     }
 }
