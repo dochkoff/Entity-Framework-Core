@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System.Text;
+using Microsoft.EntityFrameworkCore;
 using SoftUni.Data;
 using SoftUni.Models;
 
@@ -14,9 +15,12 @@ namespace SoftUni
             //Console.WriteLine(GetEmployeesWithSalaryOver50000(context));
             //Console.WriteLine(GetEmployeesFromResearchAndDevelopment(context));
             //Console.WriteLine(AddNewAddressToEmployee(context));
-            Console.WriteLine(GetEmployeesByFirstNameStartingWithSa(context));
+            Console.WriteLine(GetEmployeesInPeriod(context));
+
+            //Console.WriteLine(GetEmployeesByFirstNameStartingWithSa(context));
         }
 
+        //P03
         public static string GetEmployeesFullInformation(SoftUniContext context)
         {
             var employees = context.Employees
@@ -34,6 +38,7 @@ namespace SoftUni
             return result;
         }
 
+        //P04
         public static string GetEmployeesWithSalaryOver50000(SoftUniContext context)
         {
             var employees = context.Employees
@@ -51,6 +56,7 @@ namespace SoftUni
             return result;
         }
 
+        //P05
         public static string GetEmployeesFromResearchAndDevelopment(SoftUniContext context)
         {
             var employees = context.Employees
@@ -69,6 +75,7 @@ namespace SoftUni
             return result;
         }
 
+        //P06
         public static string AddNewAddressToEmployee(SoftUniContext context)
         {
             Address address = new Address()
@@ -98,11 +105,52 @@ namespace SoftUni
             return result;
         }
 
-        //public static string GetEmployeesInPeriod(SoftUniContext context)
-        //{
-        //    P07
-        //}
+        //P07
+        public static string GetEmployeesInPeriod(SoftUniContext context)
+        {
+            var dataString = new StringBuilder();
 
+            var employees = context.Employees
+                .Take(10)
+                .Include(e => e.Manager)
+                .Include(e => e.EmployeesProjects)
+                .ToArray();
+
+            for (int i = 0; i < 10; i++)
+            {
+                var e = employees[i];
+
+                dataString.AppendLine($"{e.FirstName} {e.LastName} - Manager: {e.Manager?.FirstName} {e.Manager.LastName}");
+
+                if (e.EmployeesProjects.Count > 0)
+                {
+                    var projects = context.EmployeesProjects
+                        .Select(ep => new
+                        {
+                            ep.EmployeeId,
+                            ep.Project.Name,
+                            ep.Project.StartDate,
+                            ep.Project.EndDate,
+                        })
+                        .Where(ep => ep.EmployeeId == e.EmployeeId)
+                        .ToArray();
+
+                    foreach (var p in projects)
+                    {
+                        if (p.StartDate.Year >= 2001 && p.StartDate.Year <= 2003)
+                        {
+                            var enddate = p.EndDate != null ? p.EndDate?.ToString("M/d/yyyy h:mm:ss tt") : "not finished";
+
+                            dataString.AppendLine($"--{p.Name} - {p.StartDate.ToString("M/d/yyyy h:mm:ss tt")} - {enddate}");
+                        }
+                    }
+                }
+            }
+
+            return dataString.ToString().Trim();
+        }
+
+        //P13
         public static string GetEmployeesByFirstNameStartingWithSa(SoftUniContext context)
         {
             var employees = context.Employees
