@@ -17,7 +17,8 @@ namespace SoftUni
             //Console.WriteLine(AddNewAddressToEmployee(context));
             //Console.WriteLine(GetEmployeesInPeriod(context));
             //Console.WriteLine(GetAddressesByTown(context));
-            Console.WriteLine(GetEmployee147(context));
+            //Console.WriteLine(GetEmployee147(context));
+            Console.WriteLine(GetDepartmentsWithMoreThan5Employees(context));
 
             //Console.WriteLine(GetEmployeesByFirstNameStartingWithSa(context));
         }
@@ -172,6 +173,7 @@ namespace SoftUni
             return result;
         }
 
+        //P09
         public static string GetEmployee147(SoftUniContext context)
         {
             StringBuilder sb = new();
@@ -198,6 +200,43 @@ namespace SoftUni
 
             return sb.ToString();
 
+        }
+
+        //P10
+        public static string GetDepartmentsWithMoreThan5Employees(SoftUniContext context)
+        {
+            StringBuilder sb = new();
+
+            var departments = context.Departments
+                .Where(d => d.Employees.Count > 5)
+                .Select(d => new
+                {
+                    d.Name,
+                    d.Manager,
+                    d.Employees
+                })
+                .OrderBy(d => d.Employees.Count)
+                .ThenBy(d => d.Name)
+                .ToList();
+
+
+
+            foreach (var d in departments)
+            {
+                sb.AppendLine($"{d.Name} - {d.Manager.FirstName} {d.Manager.LastName}");
+
+                var employeesInDepartment = d.Employees
+                    .OrderBy(e => e.FirstName)
+                    .ThenBy(e => e.LastName)
+                    .ToList();
+
+                foreach (var e in employeesInDepartment)
+                {
+                    sb.AppendLine($"{e.FirstName} {e.LastName} - {e.JobTitle}");
+                }
+            }
+
+            return sb.ToString();
         }
 
         //P13
