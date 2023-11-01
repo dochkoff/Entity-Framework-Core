@@ -20,7 +20,8 @@ namespace SoftUni
             //Console.WriteLine(GetAddressesByTown(context));
             //Console.WriteLine(GetEmployee147(context));
             //Console.WriteLine(GetDepartmentsWithMoreThan5Employees(context));
-            Console.WriteLine(GetLatestProjects(context));
+            //Console.WriteLine(GetLatestProjects(context));
+            Console.WriteLine(IncreaseSalaries(context));
 
             //Console.WriteLine(GetEmployeesByFirstNameStartingWithSa(context));
         }
@@ -260,7 +261,26 @@ namespace SoftUni
             {
                 sb.AppendLine($"{p.Name}");
                 sb.AppendLine($"{p.Description}");
-                sb.AppendLine($"{p.StartDate}");
+                sb.AppendLine($"{p.StartDate.ToString("M/d/yyyy h:mm:ss tt", CultureInfo.InvariantCulture)}");
+            }
+
+            return sb.ToString();
+        }
+
+        //P12
+        public static string IncreaseSalaries(SoftUniContext context)
+        {
+            var employees = context.Employees
+                .Where(e => e.Department.Name == "Engineering" || e.Department.Name == "Tool Design" || e.Department.Name == "Marketing" || e.Department.Name == "Information Services")
+                .OrderBy(e => e.FirstName)
+                .ThenBy(e => e.LastName);
+
+            StringBuilder sb = new();
+
+            foreach (var e in employees)
+            {
+                e.Salary *= 1.12M;
+                sb.AppendLine($"{e.FirstName} {e.LastName} (${e.Salary:F2})");
             }
 
             return sb.ToString();
