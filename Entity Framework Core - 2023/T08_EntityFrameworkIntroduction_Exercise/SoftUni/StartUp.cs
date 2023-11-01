@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Globalization;
+using System.Text;
 using Microsoft.EntityFrameworkCore;
 using SoftUni.Data;
 using SoftUni.Models;
@@ -18,7 +19,8 @@ namespace SoftUni
             //Console.WriteLine(GetEmployeesInPeriod(context));
             //Console.WriteLine(GetAddressesByTown(context));
             //Console.WriteLine(GetEmployee147(context));
-            Console.WriteLine(GetDepartmentsWithMoreThan5Employees(context));
+            //Console.WriteLine(GetDepartmentsWithMoreThan5Employees(context));
+            Console.WriteLine(GetLatestProjects(context));
 
             //Console.WriteLine(GetEmployeesByFirstNameStartingWithSa(context));
         }
@@ -219,8 +221,6 @@ namespace SoftUni
                 .ThenBy(d => d.Name)
                 .ToList();
 
-
-
             foreach (var d in departments)
             {
                 sb.AppendLine($"{d.Name} - {d.Manager.FirstName} {d.Manager.LastName}");
@@ -234,6 +234,33 @@ namespace SoftUni
                 {
                     sb.AppendLine($"{e.FirstName} {e.LastName} - {e.JobTitle}");
                 }
+            }
+
+            return sb.ToString();
+        }
+
+        //P11
+        public static string GetLatestProjects(SoftUniContext context)
+        {
+            var projects = context.Projects
+                .OrderByDescending(p => p.StartDate)
+                .Take(10)
+                .Select(p => new
+                {
+                    p.Name,
+                    p.Description,
+                    p.StartDate
+                })
+                .OrderBy(p => p.Name)
+                .ToList();
+
+            StringBuilder sb = new();
+
+            foreach (var p in projects)
+            {
+                sb.AppendLine($"{p.Name}");
+                sb.AppendLine($"{p.Description}");
+                sb.AppendLine($"{p.StartDate}");
             }
 
             return sb.ToString();
