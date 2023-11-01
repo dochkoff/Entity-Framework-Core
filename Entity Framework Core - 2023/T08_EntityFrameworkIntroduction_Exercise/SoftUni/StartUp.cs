@@ -16,7 +16,8 @@ namespace SoftUni
             //Console.WriteLine(GetEmployeesFromResearchAndDevelopment(context));
             //Console.WriteLine(AddNewAddressToEmployee(context));
             //Console.WriteLine(GetEmployeesInPeriod(context));
-            Console.WriteLine(GetAddressesByTown(context));
+            //Console.WriteLine(GetAddressesByTown(context));
+            Console.WriteLine(GetEmployee147(context));
 
             //Console.WriteLine(GetEmployeesByFirstNameStartingWithSa(context));
         }
@@ -169,6 +170,34 @@ namespace SoftUni
             string result = string.Join(Environment.NewLine, addresses.Select(a => $"{a.AddressText}, {a.Name} - {a.Employees.Count} employees"));
 
             return result;
+        }
+
+        public static string GetEmployee147(SoftUniContext context)
+        {
+            StringBuilder sb = new();
+
+            var employee = context.Employees
+                .FirstOrDefault(e => e.EmployeeId == 147);
+
+            sb.AppendLine($"{employee.FirstName} {employee.LastName} - {employee.JobTitle}");
+
+            var projects = context.EmployeesProjects
+                .Select(ep => new
+                {
+                    ep.EmployeeId,
+                    ep.Project.Name
+                })
+                .Where(ep => ep.EmployeeId == 147)
+                .OrderBy(p => p.Name)
+                .ToList();
+
+            foreach (var p in projects)
+            {
+                sb.AppendLine($"{p.Name}");
+            }
+
+            return sb.ToString();
+
         }
 
         //P13
