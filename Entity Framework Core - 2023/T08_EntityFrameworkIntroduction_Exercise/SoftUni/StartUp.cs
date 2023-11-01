@@ -13,7 +13,8 @@ namespace SoftUni
             //Console.WriteLine(GetEmployeesFullInformation(context));
             //Console.WriteLine(GetEmployeesWithSalaryOver50000(context));
             //Console.WriteLine(GetEmployeesFromResearchAndDevelopment(context));
-            Console.WriteLine(AddNewAddressToEmployee(context));
+            //Console.WriteLine(AddNewAddressToEmployee(context));
+            Console.WriteLine(GetEmployeesByFirstNameStartingWithSa(context));
         }
 
         public static string GetEmployeesFullInformation(SoftUniContext context)
@@ -93,6 +94,31 @@ namespace SoftUni
                 .Take(10);
 
             string result = string.Join(Environment.NewLine, employees.Select(e => $"{e.AddressText}"));
+
+            return result;
+        }
+
+        //public static string GetEmployeesInPeriod(SoftUniContext context)
+        //{
+        //    P07
+        //}
+
+        public static string GetEmployeesByFirstNameStartingWithSa(SoftUniContext context)
+        {
+            var employees = context.Employees
+                .Select(e => new
+                {
+                    e.FirstName,
+                    e.LastName,
+                    e.JobTitle,
+                    e.Salary
+                })
+                .Where(e => e.FirstName.StartsWith("Sa"))
+                .OrderBy(e => e.FirstName)
+                .ThenBy(e => e.LastName)
+                .ToList();
+
+            string result = string.Join(Environment.NewLine, employees.Select(e => $"{e.FirstName} {e.LastName} - {e.JobTitle} - (${e.Salary:F2})"));
 
             return result;
         }
