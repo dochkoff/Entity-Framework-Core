@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "P02_FootballBetting.Data", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "P02_FootballBetting.Data.Models", "P02_FootballBetting.Data.Models\P02_FootballBetting.Data.Models.csproj", "{92486BF3-ACAA-4647-918F-D669A2B288FB}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "P01_StudentSystem", "P01_StudentSystem\P01_StudentSystem.csproj", "{C3E95F7A-9880-4E63-9467-2F80A08A78F8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{92486BF3-ACAA-4647-918F-D669A2B288FB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{92486BF3-ACAA-4647-918F-D669A2B288FB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{92486BF3-ACAA-4647-918F-D669A2B288FB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C3E95F7A-9880-4E63-9467-2F80A08A78F8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C3E95F7A-9880-4E63-9467-2F80A08A78F8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C3E95F7A-9880-4E63-9467-2F80A08A78F8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C3E95F7A-9880-4E63-9467-2F80A08A78F8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
