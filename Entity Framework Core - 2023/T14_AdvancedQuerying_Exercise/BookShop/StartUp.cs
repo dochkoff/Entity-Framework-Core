@@ -16,7 +16,10 @@
             //Console.WriteLine(GetBooksByAgeRestriction(db, input));
 
             //P03
-            Console.WriteLine(GetGoldenBooks(db));
+            //Console.WriteLine(GetGoldenBooks(db));
+
+            //P04
+            Console.WriteLine(GetBooksByPrice(db));
         }
 
 
@@ -53,6 +56,21 @@
                 .ToList();
 
             return string.Join(Environment.NewLine, books.Select(b => b.Title));
+        }
+
+        public static string GetBooksByPrice(BookShopContext context)
+        {
+            var books = context.Books
+                .Where(b => b.Price > 40)
+                .Select(b => new
+                {
+                    b.Title,
+                    b.Price
+                })
+                .OrderByDescending(b => b.Price)
+                .ToList();
+
+            return string.Join(Environment.NewLine, books.Select(b => $"{b.Title} - ${b.Price:F2}"));
         }
     }
 }
