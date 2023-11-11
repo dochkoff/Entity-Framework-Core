@@ -1,6 +1,7 @@
 ﻿namespace BookShop
 {
     using System.Globalization;
+    using BookShop.Models;
     using BookShop.Models.Enums;
     using Castle.Core.Internal;
     using Data;
@@ -36,8 +37,12 @@
             //Console.WriteLine(GetBooksReleasedBefore(db, input));
 
             //P08
+            //string input = Console.ReadLine();
+            //Console.WriteLine(GetAuthorNamesEndingIn(db, input));
+
+            //P09
             string input = Console.ReadLine();
-            Console.WriteLine(GetAuthorNamesEndingIn(db, input));
+            Console.WriteLine(GetBookTitlesContaining(db, input));
         }
 
         //P02
@@ -160,6 +165,21 @@
                 .ToList();
 
             return string.Join(Environment.NewLine, authors.Select(a => a.FullName));
+        }
+
+        //P09
+        public static string GetBookTitlesContaining(BookShopContext context, string input)
+        {
+            var books = context.Books
+                .Select(b => new
+                {
+                    b.Title
+                })
+                .Where(b => b.Title.ToLower().Contains(input.ToLower()))
+                .OrderBy(b => b.Title)
+                .ToList();
+
+            return string.Join(Environment.NewLine, books.Select(b => b.Title));
         }
     }
 }
