@@ -2,6 +2,7 @@
 {
     using System.Globalization;
     using BookShop.Models.Enums;
+    using Castle.Core.Internal;
     using Data;
     using Initializer;
 
@@ -31,8 +32,12 @@
             //Console.WriteLine(GetBooksByCategory(db, input));
 
             //P07
+            //string input = Console.ReadLine();
+            //Console.WriteLine(GetBooksReleasedBefore(db, input));
+
+            //P08
             string input = Console.ReadLine();
-            Console.WriteLine(GetBooksReleasedBefore(db, input));
+            Console.WriteLine(GetAuthorNamesEndingIn(db, input));
         }
 
         //P02
@@ -140,6 +145,21 @@
                 .ToList();
 
             return string.Join(Environment.NewLine, books.Select(b => $"{b.Title} - {b.EditionType} - ${b.Price:F2}"));
+        }
+
+        //P08
+        public static string GetAuthorNamesEndingIn(BookShopContext context, string input)
+        {
+            var authors = context.Authors
+                .Where(a => a.FirstName.EndsWith(input))
+                .Select(a => new
+                {
+                    FullName = a.FirstName + " " + a.LastName
+                })
+                .OrderBy(a => a.FullName)
+                .ToList();
+
+            return string.Join(Environment.NewLine, authors.Select(a => a.FullName));
         }
     }
 }
