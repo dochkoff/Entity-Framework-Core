@@ -1,4 +1,6 @@
-﻿namespace BookShop
+﻿using Microsoft.EntityFrameworkCore;
+
+namespace BookShop
 {
     using System.Globalization;
     using BookShop.Models;
@@ -41,8 +43,12 @@
             //Console.WriteLine(GetAuthorNamesEndingIn(db, input));
 
             //P09
+            //string input = Console.ReadLine();
+            //Console.WriteLine(GetBookTitlesContaining(db, input));
+
+            //P10
             string input = Console.ReadLine();
-            Console.WriteLine(GetBookTitlesContaining(db, input));
+            Console.WriteLine(GetBooksByAuthor(db, input));
         }
 
         //P02
@@ -180,6 +186,24 @@
                 .ToList();
 
             return string.Join(Environment.NewLine, books.Select(b => b.Title));
+        }
+
+        //P10
+        public static string GetBooksByAuthor(BookShopContext context, string input)
+        {
+            var books = context.Books
+                .Select(b => new
+                {
+                    b.Title,
+                    b.BookId,
+                    b.Author.LastName,
+                    AuthorFullName = b.Author.FirstName + " " + b.Author.LastName
+                })
+                .Where(b => b.LastName.ToLower().StartsWith(input.ToLower()))
+                .OrderBy(b => b.BookId)
+                .ToList();
+
+            return string.Join(Environment.NewLine, books.Select(b => $"{b.Title} ({b.AuthorFullName})"));
         }
     }
 }
