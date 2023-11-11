@@ -22,11 +22,15 @@
             //Console.WriteLine(GetBooksByPrice(db));
 
             //P05
-            int input = int.Parse(Console.ReadLine());
-            Console.WriteLine(GetBooksNotReleasedIn(db, input));
+            //int input = int.Parse(Console.ReadLine());
+            //Console.WriteLine(GetBooksNotReleasedIn(db, input));
+
+            //P05
+            string input = Console.ReadLine();
+            Console.WriteLine(GetBooksByCategory(db, input));
         }
 
-
+        //P02
         public static string GetBooksByAgeRestriction(BookShopContext context, string command)
         {
             if (!Enum.TryParse<AgeRestriction>(command, true, out var ageRestriction))
@@ -46,6 +50,7 @@
             return string.Join(Environment.NewLine, books.Select(b => b.Title));
         }
 
+        //P03
         public static string GetGoldenBooks(BookShopContext context)
         {
             var books = context.Books
@@ -62,6 +67,7 @@
             return string.Join(Environment.NewLine, books.Select(b => b.Title));
         }
 
+        //P04
         public static string GetBooksByPrice(BookShopContext context)
         {
             var books = context.Books
@@ -77,6 +83,7 @@
             return string.Join(Environment.NewLine, books.Select(b => $"{b.Title} - ${b.Price:F2}"));
         }
 
+        //P05
         public static string GetBooksNotReleasedIn(BookShopContext context, int year)
         {
             var books = context.Books
@@ -88,6 +95,23 @@
                 })
                 .Where(b => b.ReleaseDate.HasValue && b.ReleaseDate.Value.Year != year)
                 .OrderBy(b => b.BookId)
+                .ToList();
+
+            return string.Join(Environment.NewLine, books.Select(b => b.Title));
+        }
+
+
+        //P06
+        public static string GetBooksByCategory(BookShopContext context, string input)
+        {
+            string[] categories = input
+                .Split(" ", StringSplitOptions.RemoveEmptyEntries)
+                .Select(c => c.ToLower())
+                .ToArray();
+
+            var books = context.Books
+                .Where(b => b.BookCategories.Any(bc => categories.Contains(bc.Category.Name.ToLower())))
+                .OrderBy(b => b.Title)
                 .ToList();
 
             return string.Join(Environment.NewLine, books.Select(b => b.Title));
