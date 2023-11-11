@@ -19,7 +19,11 @@
             //Console.WriteLine(GetGoldenBooks(db));
 
             //P04
-            Console.WriteLine(GetBooksByPrice(db));
+            //Console.WriteLine(GetBooksByPrice(db));
+
+            //P05
+            int input = int.Parse(Console.ReadLine());
+            Console.WriteLine(GetBooksNotReleasedIn(db, input));
         }
 
 
@@ -72,5 +76,22 @@
 
             return string.Join(Environment.NewLine, books.Select(b => $"{b.Title} - ${b.Price:F2}"));
         }
+
+        public static string GetBooksNotReleasedIn(BookShopContext context, int year)
+        {
+            var books = context.Books
+                .Select(b => new
+                {
+                    b.Title,
+                    b.ReleaseDate,
+                    b.BookId
+                })
+                .Where(b => b.ReleaseDate.HasValue && b.ReleaseDate.Value.Year != year)
+                .OrderBy(b => b.BookId)
+                .ToList();
+
+            return string.Join(Environment.NewLine, books.Select(b => b.Title));
+        }
+
     }
 }
