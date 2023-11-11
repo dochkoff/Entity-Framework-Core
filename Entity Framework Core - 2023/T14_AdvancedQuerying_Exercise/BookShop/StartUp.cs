@@ -1,5 +1,6 @@
 ﻿namespace BookShop
 {
+    using System.Globalization;
     using BookShop.Models.Enums;
     using Data;
     using Initializer;
@@ -25,9 +26,13 @@
             //int input = int.Parse(Console.ReadLine());
             //Console.WriteLine(GetBooksNotReleasedIn(db, input));
 
-            //P05
+            //P06
+            //string input = Console.ReadLine();
+            //Console.WriteLine(GetBooksByCategory(db, input));
+
+            //P07
             string input = Console.ReadLine();
-            Console.WriteLine(GetBooksByCategory(db, input));
+            Console.WriteLine(GetBooksReleasedBefore(db, input));
         }
 
         //P02
@@ -117,5 +122,24 @@
             return string.Join(Environment.NewLine, books.Select(b => b.Title));
         }
 
+        //P07
+        public static string GetBooksReleasedBefore(BookShopContext context, string date)
+        {
+            var parsedDate = DateTime.ParseExact(date, "dd-MM-yyyy", CultureInfo.InvariantCulture);
+
+            var books = context.Books
+                .Select(b => new
+                {
+                    b.Title,
+                    b.ReleaseDate,
+                    b.EditionType,
+                    b.Price
+                })
+                .Where(b => b.ReleaseDate < parsedDate)
+                .OrderByDescending(b => b.ReleaseDate)
+                .ToList();
+
+            return string.Join(Environment.NewLine, books.Select(b => $"{b.Title} - {b.EditionType} - ${b.Price:F2}"));
+        }
     }
 }
