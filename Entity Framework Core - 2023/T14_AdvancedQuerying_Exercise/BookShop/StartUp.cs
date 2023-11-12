@@ -59,7 +59,10 @@ namespace BookShop
             //Console.WriteLine(CountCopiesByAuthor(db));
 
             //P13
-            Console.WriteLine(GetTotalProfitByCategory(db));
+            //Console.WriteLine(GetTotalProfitByCategory(db));
+
+            //P14
+            Console.WriteLine(GetMostRecentBooks(db));
         }
 
         //P02
@@ -262,6 +265,41 @@ namespace BookShop
                 .ToList();
 
             return string.Join(Environment.NewLine, categories.Select(c => $"{c.CategoryName} ${c.TotalProfitByCategory:F2}"));
+        }
+
+        //P14
+        public static string GetMostRecentBooks(BookShopContext context)
+        {
+            var categories = context.Categories
+                .Select(c => new
+                {
+                    CategoryName = c.Name,
+                    Books = c.CategoryBooks
+                        .OrderByDescending(b => b.Book.ReleaseDate)
+                        .Select(b => new
+                        {
+                            BookTitle = b.Book.Title,
+                            ReleaseYear = b.Book.ReleaseDate!.Value.Year
+                        })
+                        .Take(3)
+                        .ToList()
+                })
+                .OrderBy(c => c.CategoryName)
+                .ToList();
+
+            StringBuilder sb = new();
+
+            foreach (var c in categories)
+            {
+                sb.AppendLine($"--{c.CategoryName}");
+
+                foreach (var b in c.Books)
+                {
+                    sb.AppendLine($"{b.BookTitle} ({b.ReleaseYear})");
+                }
+            }
+
+            return sb.ToString().Trim();
         }
     }
 }
