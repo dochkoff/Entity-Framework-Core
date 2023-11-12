@@ -3,6 +3,7 @@
 namespace BookShop
 {
     using System.Globalization;
+    using System.Text;
     using BookShop.Models;
     using BookShop.Models.Enums;
     using Castle.Core.Internal;
@@ -51,8 +52,11 @@ namespace BookShop
             //Console.WriteLine(GetBooksByAuthor(db, input));
 
             //P11
-            int input = int.Parse(Console.ReadLine());
-            Console.WriteLine(CountBooks(db, input));
+            //int input = int.Parse(Console.ReadLine());
+            //Console.WriteLine(CountBooks(db, input));
+
+            //P12
+            Console.WriteLine(CountCopiesByAuthor(db));
         }
 
         //P02
@@ -222,6 +226,22 @@ namespace BookShop
                 .ToList();
 
             return books.Count;
+
+        }
+
+        //P12
+        public static string CountCopiesByAuthor(BookShopContext context)
+        {
+            var authors = context.Authors
+                .Select(a => new
+                {
+                    FullName = a.FirstName + " " + a.LastName,
+                    BooksCount = a.Books.Sum(b => b.Copies)
+                })
+                .OrderByDescending(a => a.BooksCount)
+                .ToList();
+
+            return string.Join(Environment.NewLine, authors.Select(a => $"{a.FullName} - {a.BooksCount}"));
 
         }
     }
