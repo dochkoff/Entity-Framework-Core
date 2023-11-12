@@ -3,6 +3,7 @@
 namespace BookShop
 {
     using System.Globalization;
+    using System.Linq;
     using System.Text;
     using BookShop.Models;
     using BookShop.Models.Enums;
@@ -62,7 +63,11 @@ namespace BookShop
             //Console.WriteLine(GetTotalProfitByCategory(db));
 
             //P14
-            Console.WriteLine(GetMostRecentBooks(db));
+            //Console.WriteLine(GetMostRecentBooks(db));
+
+            //P15
+            IncreasePrices(db);
+
         }
 
         //P02
@@ -301,5 +306,23 @@ namespace BookShop
 
             return sb.ToString().Trim();
         }
+
+        //P15
+        public static void IncreasePrices(BookShopContext context)
+        {
+            int priceIncrease = 5;
+
+            var books = context.Books
+                .Where(b => b.ReleaseDate!.Value.Year < 2010);
+
+            foreach (var b in books)
+            {
+                b.Price += priceIncrease;
+            }
+
+            context.SaveChanges();
+        }
+
+
     }
 }
