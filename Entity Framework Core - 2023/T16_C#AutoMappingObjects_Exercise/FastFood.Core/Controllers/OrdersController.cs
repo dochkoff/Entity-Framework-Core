@@ -3,8 +3,10 @@
     using System;
     using System.Linq;
     using AutoMapper;
+    using AutoMapper.QueryableExtensions;
     using Data;
     using Microsoft.AspNetCore.Mvc;
+    using Microsoft.EntityFrameworkCore;
     using ViewModels.Orders;
 
     public class OrdersController : Controller
@@ -35,9 +37,18 @@
             return RedirectToAction("All", "Orders");
         }
 
-        public IActionResult All()
+        public async Task<IActionResult> All()
         {
-            throw new NotImplementedException();
+            var orders = await _context.Orders
+                .Select(o => new OrderAllViewModel
+                {
+                    Customer = o.Customer,
+                    Employee = o.Employee.Name,
+                    DateTime = o.DateTime.ToString()
+                })
+                .ToListAsync();
+
+            return View(orders);
         }
     }
 }

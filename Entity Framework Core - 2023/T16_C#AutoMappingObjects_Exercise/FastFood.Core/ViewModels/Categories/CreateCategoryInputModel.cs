@@ -1,4 +1,6 @@
-﻿namespace FastFood.Core.ViewModels.Categories
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace FastFood.Core.ViewModels.Categories
 {
     public class CreateCategoryInputModel
     {

@@ -19,7 +19,7 @@
         <select id="position" class="form-control" name="PositionId">
             @foreach (var position in Model)
             {
-                <option value="@position.PositionId">@position.PositionId</option>
+                <option value="@position.PositionId">@position.Name</option>
             }
         </select>
     </div>
@@ -28,7 +28,7 @@
         <input type="text" class="form-control" id="address" placeholder="Address..." name="address" />
     </div>
     <hr class="bg-secondary half-width" />
-	<div class="d-flex justify-content-center">
+    <div class="d-flex justify-content-center">
         <button type="submit" class="btn btn-primary me-1">Register</button>
         <a class="btn btn-primary ms-1" asp-controller="Employees" asp-action="All">View All</a>
     </div>

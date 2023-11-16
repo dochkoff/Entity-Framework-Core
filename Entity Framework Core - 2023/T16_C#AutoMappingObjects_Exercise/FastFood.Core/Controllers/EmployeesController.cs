@@ -2,8 +2,11 @@
 {
     using System;
     using AutoMapper;
+    using AutoMapper.QueryableExtensions;
     using Data;
+    using FastFood.Models;
     using Microsoft.AspNetCore.Mvc;
+    using Microsoft.EntityFrameworkCore;
     using ViewModels.Employees;
 
     public class EmployeesController : Controller
@@ -17,20 +20,58 @@
             _mapper = mapper;
         }
 
-        public IActionResult Register()
+        public async Task<IActionResult> Register()
         {
-            throw new NotImplementedException();
+            var positions = await _context.Positions
+                .ProjectTo<RegisterEmployeeViewModel>(_mapper.ConfigurationProvider)
+                .ToListAsync();
+
+            return View(positions);
         }
 
         [HttpPost]
-        public IActionResult Register(RegisterEmployeeInputModel model)
+        public async Task<IActionResult> Register(RegisterEmployeeInputModel model)
         {
-            throw new NotImplementedException();
+            if (!ModelState.IsValid)
+            {
+                RedirectToAction("Error", "Home");
+            }
+
+            //Option 1 - no automapper
+            //var employee = new Employee
+            //{
+            //    Name = model.Name,
+            //    Age = model.Age,
+            //    Address = model.Address,
+            //    PositionId = model.PositionId
+            //};
+
+            var employee = _mapper.Map<Employee>(model);
+
+            _context.Employees.Add(employee);
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction("All");
         }
 
-        public IActionResult All()
+        public async Task<IActionResult> All()
         {
-            throw new NotImplementedException();
+            //Option 1 - no automapper
+            //var employees = await _context.Employees
+            //    .Select(e => new EmployeesAllViewModel
+            //    {
+            //        Name = e.Name,
+            //        Age = e.Age,
+            //        Address = e.Address,
+            //        Position = e.Position.Name
+            //    })
+            //    .ToListAsync();
+
+            var employees = await _context.Employees
+                .ProjectTo<EmployeesAllViewModel>(_mapper.ConfigurationProvider)
+                .ToListAsync();
+
+            return View(employees);
         }
     }
 }

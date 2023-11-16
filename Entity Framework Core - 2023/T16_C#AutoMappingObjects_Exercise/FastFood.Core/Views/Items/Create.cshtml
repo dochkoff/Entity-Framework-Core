@@ -19,12 +19,12 @@
         <select id="category" class="form-control" name="CategoryId">
             @foreach (var item in Model)
             {
-                    <option value="@item.CategoryId">@item.CategoryId</option>
+                <option value="@item.CategoryId">@item.Name</option>
             }
         </select>
     </div>
     <hr class="bg-secondary half-width" />
-     <div class="d-flex justify-content-center">
+    <div class="d-flex justify-content-center">
         <button type="submit" class="btn btn-primary me-1">Create</button>
         <a class="btn btn-primary ms-1" asp-controller="Items" asp-action="All">View All</a>
     </div>
