@@ -31,7 +31,10 @@ namespace ProductShop
             //Console.WriteLine(GetProductsInRange(context));
 
             //P06
-            Console.WriteLine(GetSoldProducts(context));
+            //Console.WriteLine(GetSoldProducts(context));
+
+            //P07
+            Console.WriteLine(GetCategoriesByProductsCount(context));
 
         }
 
@@ -131,6 +134,27 @@ namespace ProductShop
                 .ToArray();
 
             string jsonOutput = JsonConvert.SerializeObject(usersWithSoldProducts, Formatting.Indented);
+
+            return jsonOutput;
+        }
+
+        //P07
+        public static string GetCategoriesByProductsCount(ProductShopContext context)
+        {
+            var categoriesByProduct = context.Categories
+                .Select(c => new
+                {
+                    category = c.Name,
+                    productsCount = c.CategoriesProducts.Count,
+                    averagePrice = c.CategoriesProducts
+                        .Average(cp => cp.Product.Price).ToString("F2"),
+                    totalRevenue = c.CategoriesProducts
+                        .Sum(cp => cp.Product.Price).ToString("F2")
+                })
+                .OrderByDescending(x => x.productsCount)
+                .ToArray();
+
+            string jsonOutput = JsonConvert.SerializeObject(categoriesByProduct, Formatting.Indented);
 
             return jsonOutput;
         }
