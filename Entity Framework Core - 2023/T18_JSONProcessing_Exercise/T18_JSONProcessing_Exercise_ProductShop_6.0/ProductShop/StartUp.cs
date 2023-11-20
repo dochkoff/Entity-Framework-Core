@@ -34,7 +34,10 @@ namespace ProductShop
             //Console.WriteLine(GetSoldProducts(context));
 
             //P07
-            Console.WriteLine(GetCategoriesByProductsCount(context));
+            //Console.WriteLine(GetCategoriesByProductsCount(context));
+
+            //P08
+            Console.WriteLine(GetUsersWithProducts(context));
 
         }
 
@@ -155,6 +158,53 @@ namespace ProductShop
                 .ToArray();
 
             string jsonOutput = JsonConvert.SerializeObject(categoriesByProduct, Formatting.Indented);
+
+            return jsonOutput;
+        }
+
+        //P08
+        public static string GetUsersWithProducts(ProductShopContext context)
+        {
+            var usersWithProducts = context.Users
+                .Where(u => u.ProductsSold.Any(p => p.BuyerId != null))
+                .Select(u => new
+                {
+                    firstName = u.FirstName,
+                    lastName = u.LastName,
+                    age = u.Age,
+                    soldProducts = u.ProductsSold
+                        .Where(p => p.BuyerId != null)
+                        .Select(p => new
+                        {
+                            name = p.Name,
+                            price = p.Price
+                        })
+                        .ToArray()
+                })
+                .OrderByDescending(u => u.soldProducts.Count())
+                .ToArray();
+
+            var output = new
+            {
+                usersCount = usersWithProducts.Count(),
+                users = usersWithProducts.Select(u => new
+                {
+                    u.firstName,
+                    u.lastName,
+                    u.age,
+                    soldProducts = new
+                    {
+                        count = u.soldProducts.Count(),
+                        products = u.soldProducts
+                    }
+                })
+            };
+
+            string jsonOutput = JsonConvert.SerializeObject(output, new JsonSerializerSettings
+            {
+                Formatting = Formatting.Indented,
+                NullValueHandling = NullValueHandling.Ignore
+            });
 
             return jsonOutput;
         }
