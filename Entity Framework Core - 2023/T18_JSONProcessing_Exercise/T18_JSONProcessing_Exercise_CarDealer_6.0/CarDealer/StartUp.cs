@@ -35,7 +35,10 @@ namespace CarDealer
             //Console.WriteLine(ImportSales(context, salesJson));
 
             //P14
-            Console.WriteLine(GetOrderedCustomers(context));
+            //Console.WriteLine(GetOrderedCustomers(context));
+
+            //P15
+            Console.WriteLine(GetCarsFromMakeToyota(context));
 
         }
 
@@ -135,10 +138,29 @@ namespace CarDealer
                     BirthDate = c.BirthDate.ToString("dd/MM/yyyy", CultureInfo.InvariantCulture),
                     c.IsYoungDriver
                 })
-
                 .ToArray();
 
             string jsonOutput = JsonConvert.SerializeObject(orderedCustomers, Formatting.Indented);
+            return jsonOutput;
+        }
+
+        //P15
+        public static string GetCarsFromMakeToyota(CarDealerContext context)
+        {
+            var carsMadeByToyota = context.Cars
+                .Where(c => c.Make == "Toyota")
+                .OrderBy(c => c.Model)
+                .ThenByDescending(c => c.TraveledDistance)
+                .Select(c => new
+                {
+                    c.Id,
+                    c.Make,
+                    c.Model,
+                    c.TraveledDistance,
+                })
+                .ToArray();
+
+            string jsonOutput = JsonConvert.SerializeObject(carsMadeByToyota, Formatting.Indented);
             return jsonOutput;
         }
     }
