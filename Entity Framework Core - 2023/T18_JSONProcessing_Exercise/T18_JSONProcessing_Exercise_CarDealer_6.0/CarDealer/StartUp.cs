@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System.Globalization;
+using System.IO;
 using AutoMapper;
 using CarDealer.Data;
 using CarDealer.DTOs;
@@ -30,8 +31,11 @@ namespace CarDealer
             //Console.WriteLine(ImportCustomers(context, customersJson));
 
             //P13
-            string salesJson = File.ReadAllText("../../../Datasets/sales.json");
-            Console.WriteLine(ImportSales(context, salesJson));
+            //string salesJson = File.ReadAllText("../../../Datasets/sales.json");
+            //Console.WriteLine(ImportSales(context, salesJson));
+
+            //P14
+            Console.WriteLine(GetOrderedCustomers(context));
 
         }
 
@@ -117,6 +121,25 @@ namespace CarDealer
             }
 
             return $"Successfully imported {sales?.Length}.";
+        }
+
+        //P14
+        public static string GetOrderedCustomers(CarDealerContext context)
+        {
+            var orderedCustomers = context.Customers
+                .OrderBy(c => c.BirthDate)
+                .ThenBy(c => c.IsYoungDriver)
+                .Select(c => new
+                {
+                    c.Name,
+                    BirthDate = c.BirthDate.ToString("dd/MM/yyyy", CultureInfo.InvariantCulture),
+                    c.IsYoungDriver
+                })
+
+                .ToArray();
+
+            string jsonOutput = JsonConvert.SerializeObject(orderedCustomers, Formatting.Indented);
+            return jsonOutput;
         }
     }
 }
