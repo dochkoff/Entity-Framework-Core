@@ -38,7 +38,13 @@ namespace CarDealer
             //Console.WriteLine(GetOrderedCustomers(context));
 
             //P15
-            Console.WriteLine(GetCarsFromMakeToyota(context));
+            //Console.WriteLine(GetCarsFromMakeToyota(context));
+
+            //P16
+            //Console.WriteLine(GetLocalSuppliers(context));
+
+            //P17
+            Console.WriteLine(GetCarsWithTheirListOfParts(context));
 
         }
 
@@ -162,6 +168,56 @@ namespace CarDealer
 
             string jsonOutput = JsonConvert.SerializeObject(carsMadeByToyota, Formatting.Indented);
             return jsonOutput;
+        }
+
+        //P16
+        public static string GetLocalSuppliers(CarDealerContext context)
+        {
+            var localSuppliers = context.Suppliers
+                .Where(s => !s.IsImporter)
+                .Select(s => new
+                {
+                    s.Id,
+                    s.Name,
+                    PartsCount = s.Parts.Count
+                })
+                .ToArray();
+
+            string jsonOutput = JsonConvert.SerializeObject(localSuppliers, Formatting.Indented);
+            return jsonOutput;
+        }
+
+        //P17
+        public static string GetCarsWithTheirListOfParts(CarDealerContext context)
+        {
+            var carWithPartsList = context.Cars
+                .Select(c => new
+                {
+                    c.Make,
+                    c.Model,
+                    c.TraveledDistance,
+                    Parts = c.PartsCars
+                    .Select(p => new
+                    {
+                        p.Part.Name,
+                        Price = p.Part.Price.ToString("F2")
+                    })
+                    .ToList()
+                })
+                .ToArray();
+
+            string jsonOtput = JsonConvert.SerializeObject(carWithPartsList
+                .Select(c => new
+                {
+                    car = new
+                    {
+                        c.Make,
+                        c.Model,
+                        c.TraveledDistance,
+                    },
+                    parts = c.Parts
+                }), Formatting.Indented);
+            return jsonOtput;
         }
     }
 }
