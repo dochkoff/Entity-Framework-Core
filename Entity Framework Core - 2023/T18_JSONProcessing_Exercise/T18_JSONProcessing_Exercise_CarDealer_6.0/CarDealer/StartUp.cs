@@ -14,8 +14,12 @@ namespace CarDealer
             CarDealerContext context = new();
 
             //P09
-            string suppliersJson = File.ReadAllText("../../../Datasets/suppliers.json");
-            Console.WriteLine(ImportSuppliers(context, suppliersJson));
+            //string suppliersJson = File.ReadAllText("../../../Datasets/suppliers.json");
+            //Console.WriteLine(ImportSuppliers(context, suppliersJson));
+
+            //P10
+            string partsJson = File.ReadAllText("../../../Datasets/parts.json");
+            Console.WriteLine(ImportParts(context, partsJson));
 
         }
 
@@ -33,6 +37,30 @@ namespace CarDealer
             context.SaveChanges();
 
             return $"Successfully imported {suppliers.Count()}.";
+        }
+
+        //P10
+        public static string ImportParts(CarDealerContext context, string inputJson)
+        {
+            var config = new MapperConfiguration(cnf => cnf.AddProfile<CarDealerProfile>());
+            IMapper mapper = new Mapper(config);
+
+            PartsDTO[] partsDTOs = JsonConvert.DeserializeObject<PartsDTO[]>(inputJson);
+            Part[] parts = mapper.Map<Part[]>(partsDTOs);
+
+            int[] supplierIds = context.Suppliers
+                .Select(x => x.Id)
+                .ToArray();
+
+            Part[] partsWithValidSuppliers = parts
+                .Where(p => supplierIds
+                .Contains(p.SupplierId))
+                .ToArray();
+
+            context.Parts.AddRange(partsWithValidSuppliers);
+            context.SaveChanges();
+
+            return $"Successfully imported {partsWithValidSuppliers.Count()}.";
         }
     }
 }
