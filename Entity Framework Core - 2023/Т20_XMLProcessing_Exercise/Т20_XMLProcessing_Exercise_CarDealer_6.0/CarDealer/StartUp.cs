@@ -26,8 +26,12 @@ namespace CarDealer
             //Console.WriteLine(ImportCars(context, inputCarsXml));
 
             //P12
-            string inputCustomersXml = File.ReadAllText("../../../Datasets/customers.xml");
-            Console.WriteLine(ImportCustomers(context, inputCustomersXml));
+            //string inputCustomersXml = File.ReadAllText("../../../Datasets/customers.xml");
+            //Console.WriteLine(ImportCustomers(context, inputCustomersXml));
+
+            //P13
+            string inputSalesXml = File.ReadAllText("../../../Datasets/sales.xml");
+            Console.WriteLine(ImportSales(context, inputSalesXml));
         }
 
         private static Mapper GetMapper()
@@ -146,6 +150,31 @@ namespace CarDealer
             context.SaveChanges();
 
             return $"Successfully imported {customers.Length}";
+        }
+
+        //P13
+        public static string ImportSales(CarDealerContext context, string inputXml)
+        {
+            XmlSerializer xmlSerializer =
+                new(typeof(ImportSaleDTO[]), new XmlRootAttribute("Sales"));
+
+            using StringReader inputReader = new(inputXml);
+            ImportSaleDTO[] ImportSaleDTOs = (ImportSaleDTO[])xmlSerializer.Deserialize(inputReader);
+
+            int[] carIds = context.Cars
+                .Select(x => x.Id)
+                .ToArray();
+
+            var mapper = GetMapper();
+
+            Sale[] sales = mapper.Map<Sale[]>(ImportSaleDTOs)
+                .Where(x => carIds.Contains(x.CarId))
+                .ToArray();
+
+            context.AddRange(sales);
+            context.SaveChanges();
+
+            return $"Successfully imported {sales.Length}";
         }
     }
 }
