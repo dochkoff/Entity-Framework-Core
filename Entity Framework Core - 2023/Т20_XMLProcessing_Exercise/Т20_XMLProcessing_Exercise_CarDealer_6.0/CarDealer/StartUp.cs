@@ -44,7 +44,10 @@ namespace CarDealer
             //Console.WriteLine(GetCarsFromMakeBmw(context));
 
             //P16
-            Console.WriteLine(GetLocalSuppliers(context));
+            //Console.WriteLine(GetLocalSuppliers(context));
+
+            //P17
+            Console.WriteLine(GetCarsWithTheirListOfParts(context));
 
             //P18
             //Console.WriteLine(GetTotalSalesByCustomer(context));
@@ -253,6 +256,37 @@ namespace CarDealer
                 .ToArray();
 
             return SerializeToXml<ExportLocalSuppliers[]>(localSuppliers, "suppliers");
+        }
+
+        //P17
+        public static string GetCarsWithTheirListOfParts(CarDealerContext context)
+        {
+            var mapper = GetMapper();
+
+            var carsWithTheirListOfParts = context.Cars
+                .Select(c => new ExportCarsWithTheirListOfParts()
+                {
+                    Make = c.Make,
+                    Model = c.Model,
+                    TraveledDistance = c.TraveledDistance,
+                    Parts = new ExportPartsDTO()
+                    {
+                        Parts = c.PartsCars
+                            .Select(pc => new PartDTO()
+                            {
+                                Name = pc.Part.Name,
+                                Price = pc.Part.Price
+                            })
+                            .OrderByDescending(p => p.Price)
+                            .ToArray()
+                    }
+                })
+                .OrderByDescending(c => c.TraveledDistance)
+                .ThenBy(c => c.Model)
+                .Take(5)
+                .ToArray();
+
+            return SerializeToXml(carsWithTheirListOfParts, "cars");
         }
 
         //P18

@@ -10,15 +10,26 @@ namespace CarDealer
         public CarDealerProfile()
         {
             CreateMap<ImportSupplierDTO, Supplier>();
+
             CreateMap<ImportPartsDTO, Part>();
+
             CreateMap<ImportCarDTO, Car>();
+
             CreateMap<ImportCustomerDTO, Customer>();
+
             CreateMap<ImportSaleDTO, Sale>();
 
             CreateMap<Car, ExportCarsWithDistance>();
+
             CreateMap<Car, ExportCarsFromMakeBmw>();
+
             CreateMap<Supplier, ExportLocalSuppliers>();
             CreateMap<ExportLocalSuppliers, ExportLocalSuppliers>();
+
+            CreateMap<Car, ExportCarsWithTheirListOfParts>();
+            CreateMap<Part, ExportPartsDTO>();
+            CreateMap<ExportCarsWithTheirListOfParts, ExportCarsWithTheirListOfParts>();
+
         }
     }
 }
