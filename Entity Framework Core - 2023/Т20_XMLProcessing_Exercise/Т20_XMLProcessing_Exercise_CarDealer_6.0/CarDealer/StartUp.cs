@@ -1,7 +1,10 @@
 ﻿using System.Data;
+using System.Text;
 using System.Xml.Serialization;
 using AutoMapper;
+using AutoMapper.QueryableExtensions;
 using CarDealer.Data;
+using CarDealer.DTOs.Export;
 using CarDealer.DTOs.Import;
 using CarDealer.Models;
 
@@ -30,8 +33,11 @@ namespace CarDealer
             //Console.WriteLine(ImportCustomers(context, inputCustomersXml));
 
             //P13
-            string inputSalesXml = File.ReadAllText("../../../Datasets/sales.xml");
-            Console.WriteLine(ImportSales(context, inputSalesXml));
+            //string inputSalesXml = File.ReadAllText("../../../Datasets/sales.xml");
+            //Console.WriteLine(ImportSales(context, inputSalesXml));
+
+            //P14
+            Console.WriteLine(GetCarsWithDistance(context));
         }
 
         private static Mapper GetMapper()
@@ -175,6 +181,34 @@ namespace CarDealer
             context.SaveChanges();
 
             return $"Successfully imported {sales.Length}";
+        }
+
+        //P14
+        public static string GetCarsWithDistance(CarDealerContext context)
+        {
+            var mapper = GetMapper();
+
+            var carsWithDistance = context.Cars
+                .Where(c => c.TraveledDistance > 2000000)
+                .OrderBy(c => c.Make)
+                .ThenBy(c => c.Model)
+                .Take(10)
+                .ProjectTo<ExportCarsWithDistance>(mapper.ConfigurationProvider)
+                .ToArray();
+
+            XmlSerializer xmlSerializer = new(typeof(ExportCarsWithDistance[]), new XmlRootAttribute("cars"));
+
+            var xsn = new XmlSerializerNamespaces();
+            xsn.Add(string.Empty, string.Empty);
+
+            StringBuilder sb = new();
+
+            using (StringWriter sw = new StringWriter(sb))
+            {
+                xmlSerializer.Serialize(sw, carsWithDistance, xsn);
+            }
+
+            return sb.ToString().TrimEnd();
         }
     }
 }
