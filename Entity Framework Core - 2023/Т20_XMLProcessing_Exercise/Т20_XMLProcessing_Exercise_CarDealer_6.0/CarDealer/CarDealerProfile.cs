@@ -17,6 +17,8 @@ namespace CarDealer
 
             CreateMap<Car, ExportCarsWithDistance>();
             CreateMap<Car, ExportCarsFromMakeBmw>();
+            CreateMap<Supplier, ExportLocalSuppliers>();
+            CreateMap<ExportLocalSuppliers, ExportLocalSuppliers>();
         }
     }
 }
