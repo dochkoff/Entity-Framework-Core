@@ -22,9 +22,12 @@ namespace CarDealer
             //Console.WriteLine(ImportParts(context, inputPartsXml));
 
             //P11
-            string inputCarsXml = File.ReadAllText("../../../Datasets/cars.xml");
-            Console.WriteLine(ImportCars(context, inputCarsXml));
+            //string inputCarsXml = File.ReadAllText("../../../Datasets/cars.xml");
+            //Console.WriteLine(ImportCars(context, inputCarsXml));
 
+            //P12
+            string inputCustomersXml = File.ReadAllText("../../../Datasets/customers.xml");
+            Console.WriteLine(ImportCustomers(context, inputCustomersXml));
         }
 
         private static Mapper GetMapper()
@@ -126,6 +129,23 @@ namespace CarDealer
         }
 
 
+        //P12
+        public static string ImportCustomers(CarDealerContext context, string inputXml)
+        {
+            XmlSerializer xmlSerializer =
+                new(typeof(ImportCustomerDTO[]), new XmlRootAttribute("Customers"));
 
+            using StringReader inputReader = new(inputXml);
+            ImportCustomerDTO[] importCustomerDTOs = (ImportCustomerDTO[])xmlSerializer.Deserialize(inputReader);
+
+            var mapper = GetMapper();
+
+            Customer[] customers = mapper.Map<Customer[]>(importCustomerDTOs);
+
+            context.AddRange(customers);
+            context.SaveChanges();
+
+            return $"Successfully imported {customers.Length}";
+        }
     }
 }
