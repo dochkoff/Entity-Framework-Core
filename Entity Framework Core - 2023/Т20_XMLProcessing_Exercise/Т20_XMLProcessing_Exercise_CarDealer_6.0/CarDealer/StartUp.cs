@@ -1,4 +1,5 @@
 ﻿using System.Data;
+using System.Globalization;
 using System.Text;
 using System.Xml.Serialization;
 using AutoMapper;
@@ -37,7 +38,10 @@ namespace CarDealer
             //Console.WriteLine(ImportSales(context, inputSalesXml));
 
             //P14
-            Console.WriteLine(GetCarsWithDistance(context));
+            //Console.WriteLine(GetCarsWithDistance(context));
+
+            //P18
+            Console.WriteLine(GetTotalSalesByCustomer(context));
         }
 
         private static Mapper GetMapper()
@@ -209,6 +213,65 @@ namespace CarDealer
             }
 
             return sb.ToString().TrimEnd();
+        }
+
+        //P18
+        public static string GetTotalSalesByCustomer(CarDealerContext context)
+        {
+            var temp = context.Customers
+                .Where(c => c.Sales.Any())
+                .Select(c => new
+                {
+                    FullName = c.Name,
+                    BoughtCars = c.Sales.Count(),
+                    SalesInfo = c.Sales.Select(s => new
+                    {
+                        Prices = c.IsYoungDriver
+                                ? s.Car.PartsCars.Sum(pc => Math.Round((double)pc.Part.Price * 0.95, 2))
+                                : s.Car.PartsCars.Sum(pc => (double)pc.Part.Price)
+                    })
+                        .ToArray(),
+                })
+                .ToArray();
+
+
+            ExportSalesPerCustomerDTO[] totalSales = temp.OrderByDescending(x => x.SalesInfo.Sum(y => y.Prices))
+                .Select(x => new ExportSalesPerCustomerDTO()
+                {
+                    FullName = x.FullName,
+                    BoughtCars = x.BoughtCars,
+                    SpentMoney = x.SalesInfo.Sum(y => (decimal)y.Prices)
+                })
+                .ToArray();
+
+            return SerializeToXml<ExportSalesPerCustomerDTO[]>(totalSales, "customers");
+
+        }
+
+        private static string SerializeToXml<T>(T dto, string xmlRootAttribute)
+        {
+            XmlSerializer xmlSerializer =
+                new XmlSerializer(typeof(T), new XmlRootAttribute(xmlRootAttribute));
+
+            StringBuilder stringBuilder = new StringBuilder();
+
+            using (StringWriter stringWriter = new StringWriter(stringBuilder, CultureInfo.InvariantCulture))
+            {
+                XmlSerializerNamespaces xmlSerializerNamespaces = new XmlSerializerNamespaces();
+                xmlSerializerNamespaces.Add(string.Empty, string.Empty);
+
+                try
+                {
+                    xmlSerializer.Serialize(stringWriter, dto, xmlSerializerNamespaces);
+                }
+                catch (Exception)
+                {
+
+                    throw;
+                }
+            }
+
+            return stringBuilder.ToString();
         }
     }
 }
