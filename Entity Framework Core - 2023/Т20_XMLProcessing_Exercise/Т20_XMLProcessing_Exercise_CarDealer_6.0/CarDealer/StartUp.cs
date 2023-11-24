@@ -40,8 +40,11 @@ namespace CarDealer
             //P14
             //Console.WriteLine(GetCarsWithDistance(context));
 
+            //P15
+            Console.WriteLine(GetCarsFromMakeBmw(context));
+
             //P18
-            Console.WriteLine(GetTotalSalesByCustomer(context));
+            //Console.WriteLine(GetTotalSalesByCustomer(context));
         }
 
         private static Mapper GetMapper()
@@ -213,6 +216,21 @@ namespace CarDealer
             }
 
             return sb.ToString().TrimEnd();
+        }
+
+        //P15
+        public static string GetCarsFromMakeBmw(CarDealerContext context)
+        {
+            var mapper = GetMapper();
+
+            var carsFromMakeBmw = context.Cars
+                .Where(c => c.Make == "BMW")
+                .OrderBy(c => c.Model)
+                .ThenByDescending(c => c.TraveledDistance)
+                .ProjectTo<ExportCarsFromMakeBmw>(mapper.ConfigurationProvider)
+                .ToArray();
+
+            return SerializeToXml<ExportCarsFromMakeBmw[]>(carsFromMakeBmw, "cars");
         }
 
         //P18
