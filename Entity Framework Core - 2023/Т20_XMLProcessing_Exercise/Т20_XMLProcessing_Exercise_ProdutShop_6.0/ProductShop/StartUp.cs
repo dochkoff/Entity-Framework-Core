@@ -35,7 +35,10 @@ namespace ProductShop
             //Console.WriteLine(ImportCategoryProducts(context, inputCategoryProductsXml));
 
             //P05
-            Console.WriteLine(GetProductsInRange(context));
+            //Console.WriteLine(GetProductsInRange(context));
+
+            //P06
+            Console.WriteLine(GetSoldProducts(context));
         }
 
         private static Mapper GetMapper()
@@ -152,6 +155,23 @@ namespace ProductShop
 
 
             return SerializeToXml<ExportProductsInRangeDTO[]>(products, "Products");
+        }
+
+        //P06
+        public static string GetSoldProducts(ProductShopContext context)
+        {
+            var mapper = GetMapper();
+
+            var users = context
+            .Users
+            .Where(u => u.ProductsSold.Any())
+            .OrderBy(u => u.LastName)
+            .ThenBy(u => u.FirstName)
+            .Take(5)
+            .ProjectTo<ExportUserDTO>(mapper.ConfigurationProvider)
+            .ToArray();
+
+            return SerializeToXml(users, "Users");
         }
 
         private static string SerializeToXml<T>(T dto, string xmlRootAttribute)

@@ -24,6 +24,12 @@ namespace ProductShop
             //P05
             CreateMap<Product, ExportProductsInRangeDTO>();
             CreateMap<ExportProductsInRangeDTO, ExportProductsInRangeDTO>();
+
+            //P06
+            CreateMap<User, ExportUserDTO>()
+                .IgnoreAllPropertiesWithAnInaccessibleSetter();
+            CreateMap<Product, ExportSoldProductsDTO>();
+
         }
     }
 }
