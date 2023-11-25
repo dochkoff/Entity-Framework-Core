@@ -1,7 +1,12 @@
-﻿using System.Linq;
+﻿using System.Globalization;
+using System.Linq;
+using System.Text;
 using System.Xml.Serialization;
 using AutoMapper;
+using AutoMapper.QueryableExtensions;
+using Microsoft.EntityFrameworkCore;
 using ProductShop.Data;
+using ProductShop.DTOs.Export;
 using ProductShop.DTOs.Import;
 using ProductShop.Models;
 
@@ -26,8 +31,11 @@ namespace ProductShop
             //Console.WriteLine(ImportCategories(context, inputCategoriesXml));
 
             //P04
-            string inputCategoryProductsXml = File.ReadAllText("../../../Datasets/categories-products.xml");
-            Console.WriteLine(ImportCategoryProducts(context, inputCategoryProductsXml));
+            //string inputCategoryProductsXml = File.ReadAllText("../../../Datasets/categories-products.xml");
+            //Console.WriteLine(ImportCategoryProducts(context, inputCategoryProductsXml));
+
+            //P05
+            Console.WriteLine(GetProductsInRange(context));
         }
 
         private static Mapper GetMapper()
@@ -121,6 +129,55 @@ namespace ProductShop
             context.SaveChanges();
 
             return $"Successfully imported {categoryProducts.Length}";
+        }
+
+        public static string GetProductsInRange(ProductShopContext context)
+        {
+            var mapper = GetMapper();
+
+            ExportProductsInRangeDTO[] products = context
+            .Products
+            .Where(p => p.Price >= 500 && p.Price <= 1000)
+            .Select(p => new ExportProductsInRangeDTO()
+            {
+                Name = p.Name,
+                Price = p.Price,
+                BuyerName = $"{p.Buyer.FirstName} {p.Buyer.LastName}"
+            })
+            .OrderBy(p => p.Price)
+            .Take(10)
+            .ProjectTo<ExportProductsInRangeDTO>(mapper.ConfigurationProvider)
+            .ToArray();
+
+
+
+            return SerializeToXml<ExportProductsInRangeDTO[]>(products, "Products");
+        }
+
+        private static string SerializeToXml<T>(T dto, string xmlRootAttribute)
+        {
+            XmlSerializer xmlSerializer =
+                new XmlSerializer(typeof(T), new XmlRootAttribute(xmlRootAttribute));
+
+            StringBuilder stringBuilder = new StringBuilder();
+
+            using (StringWriter stringWriter = new StringWriter(stringBuilder, CultureInfo.InvariantCulture))
+            {
+                XmlSerializerNamespaces xmlSerializerNamespaces = new XmlSerializerNamespaces();
+                xmlSerializerNamespaces.Add(string.Empty, string.Empty);
+
+                try
+                {
+                    xmlSerializer.Serialize(stringWriter, dto, xmlSerializerNamespaces);
+                }
+                catch (Exception)
+                {
+
+                    throw;
+                }
+            }
+
+            return stringBuilder.ToString();
         }
     }
 }
