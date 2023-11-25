@@ -22,8 +22,12 @@ namespace ProductShop
             //Console.WriteLine(ImportProducts(context, inputProductsXml));
 
             //P03
-            string inputCategoriesXml = File.ReadAllText("../../../Datasets/categories.xml");
-            Console.WriteLine(ImportCategories(context, inputCategoriesXml));
+            //string inputCategoriesXml = File.ReadAllText("../../../Datasets/categories.xml");
+            //Console.WriteLine(ImportCategories(context, inputCategoriesXml));
+
+            //P04
+            string inputCategoryProductsXml = File.ReadAllText("../../../Datasets/categories-products.xml");
+            Console.WriteLine(ImportCategoryProducts(context, inputCategoryProductsXml));
         }
 
         private static Mapper GetMapper()
@@ -88,6 +92,35 @@ namespace ProductShop
             context.SaveChanges();
 
             return $"Successfully imported {categories.Length}";
+        }
+
+        //P04
+        public static string ImportCategoryProducts(ProductShopContext context, string inputXml)
+        {
+            XmlSerializer xmlSerializer = new(typeof(ImportCategoryProductsDTO[]), new XmlRootAttribute("CategoryProducts"));
+
+            using StringReader reader = new(inputXml);
+            ImportCategoryProductsDTO[] importCategoryProductsDTOs = (ImportCategoryProductsDTO[])xmlSerializer.Deserialize(reader);
+
+            var categoriesId = context.Categories
+                .Select(c => c.Id)
+                .ToArray();
+
+            var productsId = context.Products
+                .Select(p => p.Id)
+                .ToArray();
+
+            var mapper = GetMapper();
+
+            CategoryProduct[] categoryProducts = mapper.Map<CategoryProduct[]>(importCategoryProductsDTOs
+                .Where(cp =>
+                    categoriesId.Contains(cp.CategoryId)
+                    && productsId.Contains(cp.ProductId)));
+
+            context.AddRange(categoryProducts);
+            context.SaveChanges();
+
+            return $"Successfully imported {categoryProducts.Length}";
         }
     }
 }
