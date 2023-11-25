@@ -18,10 +18,12 @@ namespace ProductShop
             //Console.WriteLine(ImportUsers(context, inputUsersXml));
 
             //P02
-            string inputProductsXml = File.ReadAllText("../../../Datasets/products.xml");
-            Console.WriteLine(ImportProducts(context, inputProductsXml));
+            //string inputProductsXml = File.ReadAllText("../../../Datasets/products.xml");
+            //Console.WriteLine(ImportProducts(context, inputProductsXml));
 
-
+            //P03
+            string inputCategoriesXml = File.ReadAllText("../../../Datasets/categories.xml");
+            Console.WriteLine(ImportCategories(context, inputCategoriesXml));
         }
 
         private static Mapper GetMapper()
@@ -69,6 +71,23 @@ namespace ProductShop
             return $"Successfully imported {products.Length}";
         }
 
+        //P03
+        public static string ImportCategories(ProductShopContext context, string inputXml)
+        {
+            XmlSerializer xmlSerializer = new(typeof(ImportCategoryDTO[]), new XmlRootAttribute("Categories"));
 
+            using StringReader reader = new(inputXml);
+            ImportCategoryDTO[] ImportCategoryDTOs = (ImportCategoryDTO[])xmlSerializer.Deserialize(reader);
+
+            var mapper = GetMapper();
+
+            Category[] categories = mapper.Map<Category[]>(ImportCategoryDTOs
+                .Where(p => p.Name != null));
+
+            context.AddRange(categories);
+            context.SaveChanges();
+
+            return $"Successfully imported {categories.Length}";
+        }
     }
 }
