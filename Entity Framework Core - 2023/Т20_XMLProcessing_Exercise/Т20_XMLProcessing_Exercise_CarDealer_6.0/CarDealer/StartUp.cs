@@ -47,10 +47,13 @@ namespace CarDealer
             //Console.WriteLine(GetLocalSuppliers(context));
 
             //P17
-            Console.WriteLine(GetCarsWithTheirListOfParts(context));
+            //Console.WriteLine(GetCarsWithTheirListOfParts(context));
 
             //P18
             //Console.WriteLine(GetTotalSalesByCustomer(context));
+
+            //P19
+            Console.WriteLine(GetSalesWithAppliedDiscount(context));
         }
 
         private static Mapper GetMapper()
@@ -206,10 +209,10 @@ namespace CarDealer
                 .OrderBy(c => c.Make)
                 .ThenBy(c => c.Model)
                 .Take(10)
-                .ProjectTo<ExportCarsWithDistance>(mapper.ConfigurationProvider)
+                .ProjectTo<ExportCarWithElementsDTO>(mapper.ConfigurationProvider)
                 .ToArray();
 
-            XmlSerializer xmlSerializer = new(typeof(ExportCarsWithDistance[]), new XmlRootAttribute("cars"));
+            XmlSerializer xmlSerializer = new(typeof(ExportCarWithElementsDTO[]), new XmlRootAttribute("cars"));
 
             var xsn = new XmlSerializerNamespaces();
             xsn.Add(string.Empty, string.Empty);
@@ -297,7 +300,7 @@ namespace CarDealer
                 .Select(c => new
                 {
                     FullName = c.Name,
-                    BoughtCars = c.Sales.Count(),
+                    BoughtCars = c.Sales.Count,
                     SalesInfo = c.Sales.Select(s => new
                     {
                         Prices = c.IsYoungDriver
@@ -320,6 +323,30 @@ namespace CarDealer
 
             return SerializeToXml<ExportSalesPerCustomerDTO[]>(totalSales, "customers");
 
+        }
+
+        //P19
+        public static string GetSalesWithAppliedDiscount(CarDealerContext context)
+        {
+            ExportSaleAppliedDiscountDTO[] sales = context.Sales
+                .Select(s => new ExportSaleAppliedDiscountDTO()
+                {
+                    Car = new ExportCarWithAttrDTO()
+                    {
+                        Make = s.Car.Make,
+                        Model = s.Car.Model,
+                        TraveledDistance = s.Car.TraveledDistance
+                    },
+                    Discount = (int)s.Discount,
+                    CustomerName = s.Customer.Name,
+                    Price = s.Car.PartsCars.Sum(p => p.Part.Price),
+                    PriceWithDiscount =
+                        Math.Round((double)(s.Car.PartsCars
+                            .Sum(p => p.Part.Price) * (1 - (s.Discount / 100))), 4)
+                })
+                .ToArray();
+
+            return SerializeToXml<ExportSaleAppliedDiscountDTO[]>(sales, "sales");
         }
 
         private static string SerializeToXml<T>(T dto, string xmlRootAttribute)
