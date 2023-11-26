@@ -1,5 +1,4 @@
 ﻿using System.Globalization;
-using System.Linq;
 using System.Text;
 using System.Xml.Serialization;
 using AutoMapper;
@@ -41,7 +40,10 @@ namespace ProductShop
             //Console.WriteLine(GetSoldProducts(context));
 
             //P07
-            Console.WriteLine(GetCategoriesByProductsCount(context));
+            //Console.WriteLine(GetCategoriesByProductsCount(context));
+
+            //P08
+            Console.WriteLine(GetUsersWithProducts(context));
         }
 
         private static Mapper GetMapper()
@@ -78,10 +80,7 @@ namespace ProductShop
 
             var mapper = GetMapper();
 
-            Product[] products = mapper.Map<Product[]>(importProductsDTOs
-                .Where(p => p.Name != null
-                    && p.BuyerId != null
-                    && p.SellerId != null));
+            Product[] products = mapper.Map<Product[]>(importProductsDTOs);
 
             context.AddRange(products);
             context.SaveChanges();
@@ -176,8 +175,6 @@ namespace ProductShop
         //P07
         public static string GetCategoriesByProductsCount(ProductShopContext context)
         {
-            //var mapper = GetMapper();
-
             var categories = context.Categories
                 .Select(c => new ExportCategoriesDTO()
                 {
@@ -191,6 +188,44 @@ namespace ProductShop
                 .ToArray();
 
             return SerializeToXml(categories, "Categories");
+        }
+
+        //P08
+        public static string GetUsersWithProducts(ProductShopContext context)
+        {
+            ExportUsersWithAgeDTO[] users = context
+            .Users
+            .Where(u => u.ProductsSold.Any())
+            .OrderByDescending(u => u.ProductsSold.Count)
+            .Select(u => new ExportUsersWithAgeDTO()
+            {
+                FirstName = u.FirstName,
+                LastName = u.LastName,
+                Age = u.Age,
+                ProductsWithCount = new ExportSoldProductsWithCountDTO()
+                {
+                    Count = u.ProductsSold.Count,
+                    SoldProducts = u.ProductsSold
+                        .Select(p => new ExportSoldProductsDTO()
+                        {
+                            Name = p.Name,
+                            Price = p.Price
+                        })
+                        .OrderByDescending(p => p.Price)
+                        .ToArray()
+                }
+            })
+            .ToArray();
+
+            ExportUsersWithCount resultDto = new()
+            {
+                Count = users.Length,
+                UsersWithAge = users
+                    .Take(10)
+                    .ToArray()
+            };
+
+            return SerializeToXml(resultDto, "Users");
         }
 
         private static string SerializeToXml<T>(T dto, string xmlRootAttribute)

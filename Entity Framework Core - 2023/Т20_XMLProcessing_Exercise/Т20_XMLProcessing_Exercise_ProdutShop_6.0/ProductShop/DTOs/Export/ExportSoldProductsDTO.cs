@@ -1,5 +1,4 @@
-﻿using System;
-using System.Xml.Serialization;
+﻿using System.Xml.Serialization;
 
 namespace ProductShop.DTOs.Export
 {
@@ -13,4 +12,3 @@ namespace ProductShop.DTOs.Export
         public decimal Price { get; set; }
     }
 }
-

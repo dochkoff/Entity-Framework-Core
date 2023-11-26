@@ -33,6 +33,8 @@ namespace ProductShop
             //P07
             CreateMap<Category, ExportCategoriesDTO>();
 
+            //P08
+            CreateMap<User, ExportUsersWithCount>();
         }
     }
 }

@@ -16,10 +16,10 @@
         public decimal Price { get; set; }
 
         public int SellerId { get; set; }
-        public User Seller { get; set; } = null!;
+        public User Seller { get; set; }
 
         public int? BuyerId { get; set; }
-        public User? Buyer { get; set; } = null!;
+        public User? Buyer { get; set; }
 
         public ICollection<CategoryProduct> CategoryProducts { get; set; }
     }
