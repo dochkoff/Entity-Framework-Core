@@ -30,6 +30,9 @@ namespace ProductShop
                 .IgnoreAllPropertiesWithAnInaccessibleSetter();
             CreateMap<Product, ExportSoldProductsDTO>();
 
+            //P07
+            CreateMap<Category, ExportCategoriesDTO>();
+
         }
     }
 }

@@ -38,7 +38,10 @@ namespace ProductShop
             //Console.WriteLine(GetProductsInRange(context));
 
             //P06
-            Console.WriteLine(GetSoldProducts(context));
+            //Console.WriteLine(GetSoldProducts(context));
+
+            //P07
+            Console.WriteLine(GetCategoriesByProductsCount(context));
         }
 
         private static Mapper GetMapper()
@@ -134,10 +137,9 @@ namespace ProductShop
             return $"Successfully imported {categoryProducts.Length}";
         }
 
+        //П05
         public static string GetProductsInRange(ProductShopContext context)
         {
-            var mapper = GetMapper();
-
             ExportProductsInRangeDTO[] products = context
             .Products
             .Where(p => p.Price >= 500 && p.Price <= 1000)
@@ -149,10 +151,7 @@ namespace ProductShop
             })
             .OrderBy(p => p.Price)
             .Take(10)
-            .ProjectTo<ExportProductsInRangeDTO>(mapper.ConfigurationProvider)
             .ToArray();
-
-
 
             return SerializeToXml<ExportProductsInRangeDTO[]>(products, "Products");
         }
@@ -172,6 +171,26 @@ namespace ProductShop
             .ToArray();
 
             return SerializeToXml(users, "Users");
+        }
+
+        //P07
+        public static string GetCategoriesByProductsCount(ProductShopContext context)
+        {
+            //var mapper = GetMapper();
+
+            var categories = context.Categories
+                .Select(c => new ExportCategoriesDTO()
+                {
+                    Name = c.Name,
+                    Count = c.CategoryProducts.Count,
+                    AveragePrice = c.CategoryProducts.Average(cp => cp.Product.Price),
+                    TotalRevenue = c.CategoryProducts.Sum(cp => cp.Product.Price)
+                })
+                .OrderByDescending(c => c.Count)
+                .ThenBy(c => c.TotalRevenue)
+                .ToArray();
+
+            return SerializeToXml(categories, "Categories");
         }
 
         private static string SerializeToXml<T>(T dto, string xmlRootAttribute)
