@@ -9,7 +9,6 @@
     using System;
     using System.Collections.Generic;
     using System.ComponentModel.DataAnnotations;
-    using System.Diagnostics.Metrics;
     using System.Globalization;
     using System.Text;
 
@@ -125,7 +124,6 @@
                             Producer = medicineDto.Producer
                         };
 
-                        // Check if a medicine with the same name and producer already exists in the current pharmacy
                         if (pharmacyToAdd.Medicines.Any(m => m.Name == medicineDto.Name && m.Producer == medicineDto.Producer))
                         {
                             sb.AppendLine(ErrorMessage);
@@ -135,15 +133,6 @@
                         {
                             pharmacyToAdd.Medicines.Add(medicine);
                         }
-
-                        // Check if a medicine with the same name and producer exists in any pharmacy
-                        //if (pharmacies..Any(m => m.Name == medicineDto.Name && m.Producer == medicineDto.Producer))
-                        //{
-                        //    sb.AppendLine(ErrorMessage);
-                        //    continue;
-                        //}
-
-
                     }
                 }
 

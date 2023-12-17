@@ -2,7 +2,6 @@
 {
     using System.Globalization;
     using Medicines.Data;
-    using Medicines.Data.Models.Enums;
     using Medicines.DataProcessor.ExportDtos;
     using Medicines.Helpers;
     using Newtonsoft.Json;
@@ -13,7 +12,6 @@
         {
             if (!DateTime.TryParseExact(date, "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime parsedDate))
             {
-                // Handle invalid date format
                 return "Invalid date format!";
             }
 
