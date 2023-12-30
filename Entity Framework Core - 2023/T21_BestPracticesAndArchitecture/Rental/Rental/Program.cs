@@ -1,11 +1,17 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Rental.Core.Contracts;
+using Rental.Core.Services;
 using Rental.Infrastructure.Data;
+using Rental.Infrastructure.Data.Common;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddDbContext<RentalDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("RentalContext")));
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+
+builder.Services.AddScoped<IRepository, Repository>();
+builder.Services.AddScoped<IPropertyService, PropertyService>();
 
 var app = builder.Build();
 

@@ -20,4 +20,10 @@
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
   </ItemGroup>
+  <ItemGroup>
+    <None Remove="Views\Property\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Views\Property\" />
+  </ItemGroup>
 </Project>
