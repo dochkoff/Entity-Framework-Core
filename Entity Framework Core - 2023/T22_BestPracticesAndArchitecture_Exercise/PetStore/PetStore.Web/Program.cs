@@ -1,6 +1,12 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using PetStore.Web.Data;
+using PetStore.Data;
+using PetStore.Data.Common.Models;
+using PetStore.Data.Common.Repos;
+using PetStore.Data.Models;
+using PetStore.Data.Repositories;
+using PetStore.Services;
+using PetStore.Services.Interfaces;
 
 namespace PetStore.Web
 {
@@ -16,7 +22,17 @@ namespace PetStore.Web
                 options.UseSqlServer(connectionString));
             builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
-            builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
+
+            builder.Services.AddScoped<ICategoryService, CategoryService>();
+
+            builder.Services.AddDefaultIdentity<IdentityUser>(options =>
+            {
+                options.SignIn.RequireConfirmedAccount = false;
+                options.Password.RequiredLength = 4;
+                options.Password.RequireNonAlphanumeric = false;
+                options.Password.RequireDigit = false;
+                options.Password.RequireUppercase = false;
+            })
                 .AddEntityFrameworkStores<ApplicationDbContext>();
             builder.Services.AddControllersWithViews();
 
